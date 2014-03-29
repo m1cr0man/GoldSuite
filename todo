@@ -1,7 +1,18 @@
 --TODO LIST CSSTFORM 2014
 
 local done = false
-local bak = paintutils.loadImage("tdlbak.nfp")
+local x
+local y
+x,y = term.getSize()
+
+if x < 40 then
+	local bak = paintutils.loadImage("tdlpcbak.nfp")
+elseif x > 40 then
+	local bak = paintutils.loadImage("tdlbak.nfp")
+else
+	print("ERROR CODE 1")
+	sleep(.5)
+end
 
 term.clear()
 term.setCursorPos(1,1)
