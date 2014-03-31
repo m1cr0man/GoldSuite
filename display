@@ -1,2 +1,0 @@
-local image = paintutils.loadImage("/.darkui")
-paintutils.drawImage(image, 1, 1)
