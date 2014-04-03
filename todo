@@ -1,45 +1,76 @@
 --TODO LIST CSSTFORM 2014
+os.loadAPI(shell.resolve("themeAPI"))
 
 local done = false
 local x, y
 local xmax, ymax
+local todo = {}
+local input
+local theme
+
+theme = themeAPI.loadTheme()
+if theme == "" then
+	theme = {[1]="Default",[2]=colors.brown,[3]=colors.lightGray,[4]=colors.yellow,[5]="",[6]=colors.black,[7]=colors.red}
+end
 
 xmax, ymax = term.getSize()
 
+--this draws the background of the program
 function drawBak()
-	for y=1, ymax do
-		term.setBackgroundColor(colors.brown)
-		term.setCursorPos(1,y)
-		term.clearLine()
-	end
-	for y=3, ymax do
-		term.setBackgroundColor(colors.yellow)
-		term.setCursorPos(1,y)
-		term.clearLine()
-	end
-	y = ymax - 2
-	for ymax = ymax, y, -1 do
-		term.setBackgroundColor(colors.lightGray)
-		term.setCursorPos(1,ymax)
-		term.clearLine()
+	if theme[1] =="Default" then
+		for y=1, ymax do
+			term.setBackgroundColor(theme[2])
+			term.setCursorPos(1,y)
+			term.clearLine()
+		end
+		for y=3, ymax do
+			term.setBackgroundColor(theme[4])
+			term.setCursorPos(1,y)
+			term.clearLine()
+		end
+		y = ymax - 2
+		for ymax = ymax, y, -1 do
+			term.setBackgroundColor(theme[3])
+			term.setCursorPos(1,ymax)
+			term.clearLine()
+		end
+	else
+		for y=1, ymax do
+			term.setBackgroundColor(theme[2])
+			term.setCursorPos(1,y)
+			term.clearLine()
+		end
+		for y=3, ymax do
+			term.setBackgroundColor(theme[4])
+			term.setCursorPos(1,y)
+			term.clearLine()
+		end
+		y = ymax - 2
+		for ymax = ymax, y, -1 do
+			term.setBackgroundColor(theme[3])
+			term.setCursorPos(1,ymax)
+			term.clearLine()
+		end
 	end
 end
 
-term.clear()
-term.setCursorPos(1,1)
 
-local todo = {}
-local input
-
-print("Would you like to load a todo list? (y/n)")
-_,input = os.pullEvent("char")
-if input == "y" then
-	local file = fs.open("tdl.list", "r")
-	local data = file.readAll()
-	file.close()
-	todo = textutils.unserialize(data)
-else
-	--do nothing
+--check for saved list
+if fs.exists("tdl.list") then
+	if term.isColor() then
+		term.setBackgroundColor(theme[2])
+		term.clear()
+	end
+	print("Would you like to load a todo list? (y/n)")
+	_,input = os.pullEvent("char")
+	if input == "y" then
+		local file = fs.open("tdl.list", "r")
+		local data = file.readAll()
+		file.close()
+		todo = textutils.unserialize(data)
+	else
+		--do nothing
+	end
 end
 
 while done == false do
@@ -49,32 +80,32 @@ while done == false do
 	end
 	term.setCursorPos(1,1)
 	if term.isColor() then
-		term.setTextColor(colors.red)
+		term.setTextColor(theme[7])
 	end
 	
 	if (term.isColor()) then
-		term.setBackgroundColor(colors.brown)
+		term.setBackgroundColor(theme[2])
 	end
 	print("TODO LIST: ")
 
 	term.setCursorPos(1,3)
 	if term.isColor() then
-		term.setTextColor(colors.black)
-		term.setBackgroundColor(colors.yellow)
+		term.setTextColor(theme[6])
+		term.setBackgroundColor(theme[4])
 	end
 	for i,v in pairs(todo) do
 		print(v)
 	end
 	
 	if (term.isColor()) then
-		term.setBackgroundColor(colors.lightGray)
+		term.setBackgroundColor(theme[3])
 	end
-	term.setCursorPos(1,18)
+	term.setCursorPos(1,y)
 	print("1-9 to add/delete E to exit S to save")
 	_,input = os.pullEvent("char")
 	
 	if (term.isColor()) then
-		term.setBackgroundColor(colors.brown)
+		term.setBackgroundColor(theme[2])
 	end
 	if input == "e" then
 		break
