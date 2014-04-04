@@ -1,4 +1,5 @@
---TODO LIST CSSTFORM 2014
+--TODO LIST (c) 2014 GoldProgramming
+--Csstform
 os.loadAPI(shell.resolve("themeAPI"))
 
 local done = false
@@ -101,7 +102,7 @@ while done == false do
 		term.setBackgroundColor(theme[3])
 	end
 	term.setCursorPos(1,y)
-	print("1-9 to add/delete E to exit S to save")
+	print("1-9 to add/delete E to exit S for settings")
 	_,input = os.pullEvent("char")
 	
 	if (term.isColor()) then
@@ -219,5 +220,7 @@ if (term.isColor()) then
 	term.setBackgroundColor(colors.black)
 	term.setTextColor(colors.white)
 end
+
+os.unloadAPI(shell)
 term.clear()
 term.setCursorPos(1,1)
