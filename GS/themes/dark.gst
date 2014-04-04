@@ -1,0 +1,9 @@
+{
+[1]="Dark",
+[2]=colors.gray,
+[3]=colors.gray,
+[4]=colors.black,
+[5]=colors.lightGray,
+[6]=colors.white,
+[7]=colors.red
+}

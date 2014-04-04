@@ -33,9 +33,9 @@ function loadTheme()
 		return default
 	else
 		file = fs.open("GS/themes/"..tostring(settings[2]), "r")
-		local theme = textutils.unserialize(file.readAll())
+		local theme = file.readAll()
+		theme = textutils.unserialize(theme)
 		file.close()
+		return theme
 	end
-
-	return theme
 end
