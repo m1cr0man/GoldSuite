@@ -35,8 +35,6 @@ function drawBak()
 			term.clearLine()
 		end
 	else
-		print(theme[1])
-		sleep(.5)
 		for y=1, ymax do
 			term.setBackgroundColor(theme[2])
 			term.setCursorPos(1,y)

@@ -22,12 +22,12 @@
 --[1]=directory (leave blank if at root)
 --[2]=theme (leave blank if default)
 
-function myUnserialize( s )
+function unserialize( s )
 	if type( s ) ~= "string" then error("String expected, got " .. type( s ), 2 ) end
 	local func, err = loadstring( "return " .. s )
 	if func then
 		setfenv( func, _G )
-		local ok, err = pcall = ( func )
+		local ok, err = pcall( func )
 		if ok then
 			return err
 		end
@@ -46,7 +46,7 @@ function loadTheme()
 	else
 		file = fs.open("GS/themes/"..tostring(settings[2]), "r")
 		local theme = file.readAll()
-		theme = myUnserialize(theme)
+		theme = unserialize(theme)
 		file.close()
 		return theme
 	end

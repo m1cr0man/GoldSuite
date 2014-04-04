@@ -1,0 +1,9 @@
+{
+[1]="Blue",
+[2]=colors.lightBlue,
+[3]=colors.lightBlue,
+[4]=colors.white,
+[5]=colors.lightGray,
+[6]=colors.gray,
+[7]=colors.black
+}
