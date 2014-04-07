@@ -1,12 +1,9 @@
-GoldSuite
+GoldList
 ===========
 
-A suite of programs for ComputerCraft
+A ToDo List program made by the GoldProgramming Team.
 
-Programs (So far):
-
--Gold Lists: A todo list with fully functional syncing between computers(WIP)
-
--Gold Writer: A fully featured text editor(NYI)
-
--Gold Show: A slideshow program.(NYI)
+Features:
+~Normal & Advanced Computer support
+~Theme Changing
+~List saving
