@@ -1,15 +1,20 @@
 --TODO LIST (c) 2014 GoldProgramming
 --Csstform
-os.loadAPI(shell.resolve("themeAPI"))
+os.loadAPI(shell.resolve("GS/GSAPI"))
 
 local done = false
 local x, y
 local xmax, ymax
 local todo = {}
+local themes = {[1]="default",[2]="blue.gst",[3]="dark.gst"}
 local input
 local theme
+local settings
+local newTheme
 
-theme = themeAPI.loadTheme()
+
+
+theme = GSAPI.loadTheme()
 if theme == "" then
 	theme = {[1]="Default",[2]=colors.brown,[3]=colors.lightGray,[4]=colors.yellow,[5]="",[6]=colors.black,[7]=colors.red}
 end
@@ -18,6 +23,10 @@ xmax, ymax = term.getSize()
 
 --this draws the background of the program
 function drawBak()
+	theme = GSAPI.loadTheme()
+	if theme == "" then
+		theme = {[1]="Default",[2]=colors.brown,[3]=colors.lightGray,[4]=colors.yellow,[5]="",[6]=colors.black,[7]=colors.red}
+	end
 	if theme[1] =="Default" then
 		for y=1, ymax do
 			term.setBackgroundColor(theme[2])
@@ -62,7 +71,7 @@ if fs.exists("tdl.list") then
 		term.setBackgroundColor(theme[2])
 		term.clear()
 	end
-	print("Would you like to load a todo list? (y/n)")
+	print("Would you like to load your previously saved todo list? (y/n)")
 	_,input = os.pullEvent("char")
 	if input == "y" then
 		local file = fs.open("tdl.list", "r")
@@ -98,7 +107,7 @@ while done == false do
 		print(v)
 	end
 	
-	if (term.isColor()) then
+	if term.isColor() then
 		term.setBackgroundColor(theme[3])
 	end
 	term.setCursorPos(1,y)
@@ -111,9 +120,64 @@ while done == false do
 	if input == "e" then
 		break
 	elseif input == "s" then
+		term.clear()
+		term.setCursorPos(1,1)
+		print("[1] Save list")
+		print("[2] Change theme")
+		print("[3] Exit")
+		_,input = os.pullEvent("char")
+
+		if input == "1" then
+			local file = fs.open("tdl.list", "w")
+			file.write(textutils.serialize(todo))
+			file.close()
+		elseif input == "2" then
+			term.clear()
+			term.setCursorPos(1,1)
+			for i,v in pairs(themes) do
+				print("["..i.."]"..v)
+			end
+
+			_,input = os.pullEvent("char")
+
+			if input == "1" then
+				newTheme = themes[1]
+			elseif input == "2" then
+				newTheme = themes[2]
+			elseif input == "3" then
+				newTheme = themes[3]
+			elseif input == "4" then
+				newTheme = themes[4]
+			elseif input == "5" then
+				newTheme = themes[5]
+			elseif input == "6" then
+				newTheme = themes[6]
+			elseif input == "7" then
+				newTheme = themes[7]
+			elseif input == "8" then
+				newTheme = themes[8]
+			elseif input == "9" then
+				newTheme = themes[9]
+			end
+
+			settings = {[1]="",[2]=newTheme}
+
+			local file = fs.open("GS/universal.settings", "w")
+			if settings[2] == nil then
+				settings[2] = "default"
+			end
+			file.write(textutils.serialize(settings))
+			file.close()
+
+		elseif input == "3" then
+			--do nothing
+		end
+
+		--[[
 		local file = fs.open("tdl.list", "w")
 		file.write(textutils.serialize(todo))
 		file.close()
+		]]--
 	elseif input == "1" then
 		if todo[1] == nil then
 			term.clear()
@@ -221,6 +285,5 @@ if (term.isColor()) then
 	term.setTextColor(colors.white)
 end
 
-os.unloadAPI(shell)
 term.clear()
 term.setCursorPos(1,1)
