@@ -9,4 +9,4 @@ Programs (So far):
 
 -Gold Writer: A fully featured text editor(NYI)
 
--Gold Show: A slideshow program.
+-Gold Show: A slideshow program.(NYI)
