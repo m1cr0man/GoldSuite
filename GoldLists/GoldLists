@@ -1,284 +1,144 @@
---TODO LIST (c) 2014 GoldProgramming
---Csstform
+--TODO LIST (c)GoldProgramming 2014
+--Csstform & M1cr0man
+
 os.loadAPI(shell.resolve("GS/GSAPI"))
 
-local done = false
-local x, y
-local xmax, ymax
-local todo = {}
+--Setup basic variables
+local titleEnd, theme, settings, x, y = 2, {[1] = "default", [2] = "blue.gst", [3] = "dark.gst"}, {};
+local xmax, ymax = term.getSize()
+
 local themes = {[1]="default",[2]="blue.gst",[3]="dark.gst"}
-local input
-local theme
-local settings
-local newTheme
-
-
 
 theme = GSAPI.loadTheme()
 if theme == "" then
 	theme = {[1]="Default",[2]=colors.brown,[3]=colors.lightGray,[4]=colors.yellow,[5]="",[6]=colors.black,[7]=colors.red}
 end
 
+local todo = {}
+
 xmax, ymax = term.getSize()
 
---this draws the background of the program
-function drawBak()
-	theme = GSAPI.loadTheme()
-	if theme == "" then
-		theme = {[1]="Default",[2]=colors.brown,[3]=colors.lightGray,[4]=colors.yellow,[5]="",[6]=colors.black,[7]=colors.red}
+--All inclusive print function
+function printex(bgNumber, colourNumber, x, y, text)
+	if term.isColour() then
+		term.setBackgroundColor(theme[bgNumber])
+		term.setTextColor(theme[colourNumber])
 	end
-	if theme[1] =="Default" then
-		for y=1, ymax do
-			term.setBackgroundColor(theme[2])
-			term.setCursorPos(1,y)
-			term.clearLine()
-		end
-		for y=3, ymax do
-			term.setBackgroundColor(theme[4])
-			term.setCursorPos(1,y)
-			term.clearLine()
-		end
-		y = ymax - 2
-		for ymax = ymax, y, -1 do
-			term.setBackgroundColor(theme[3])
-			term.setCursorPos(1,ymax)
-			term.clearLine()
-		end
-	else
-		for y=1, ymax do
-			term.setBackgroundColor(theme[2])
-			term.setCursorPos(1,y)
-			term.clearLine()
-		end
-		for y=3, ymax do
-			term.setBackgroundColor(theme[4])
-			term.setCursorPos(1,y)
-			term.clearLine()
-		end
-		y = ymax - 2
-		for ymax = ymax, y, -1 do
-			term.setBackgroundColor(theme[3])
-			term.setCursorPos(1,ymax)
-			term.clearLine()
-		end
-	end
+	term.setCursorPos(x, y)
+	print(text)
 end
 
-
---check for saved list
-if fs.exists("tdl.list") then
-	if term.isColor() then
-		term.setBackgroundColor(theme[2])
-		term.clear()
-	end
-	print("Would you like to load your previously saved todo list? (y/n)")
-	_,input = os.pullEvent("char")
-	if input == "y" then
-		local file = fs.open("tdl.list", "r")
-		local data = file.readAll()
-		file.close()
-		todo = textutils.unserialize(data)
-	else
-		--do nothing
-	end
-end
-
-while done == false do
+--Draws background fillings
+function drawBG()
+	if not term.isColour() then return end
+	term.setBackgroundColor(theme[4])
 	term.clear()
-	if term.isColor() then
-		drawBak()
+	term.setBackgroundColor(theme[2])
+	for y = 1, titleEnd do
+		term.setCursorPos(1, y)
+		term.clearLine()
 	end
-	term.setCursorPos(1,1)
-	if term.isColor() then
-		term.setTextColor(theme[7])
+	term.setBackgroundColor(theme[3])
+	for y = ymax - titleEnd + 1, ymax do
+		term.setCursorPos(1, y)
+		term.clearLine()
 	end
-	
-	if (term.isColor()) then
-		term.setBackgroundColor(theme[2])
-	end
-	print("TODO LIST: ")
+end
 
-	term.setCursorPos(1,3)
-	if term.isColor() then
-		term.setTextColor(theme[6])
-		term.setBackgroundColor(theme[4])
+--Load last saved list on user request
+function loadLast()
+	if fs.exists("tdl.list") then
+		drawBG()
+		printex(2, 7, 1, 1, "Would you like to load your previously saved todo list? (y/n)")
+		input = select(2, os.pullEvent("char")):lower()
+		if input == "y" then
+			local file = fs.open("tdl.list", "r")
+			local data = file.readAll()
+			file.close()
+			todo = textutils.unserialize(data)
+		end
 	end
-	for i,v in pairs(todo) do
-		print(v)
-	end
-	
-	if term.isColor() then
-		term.setBackgroundColor(theme[3])
-	end
-	term.setCursorPos(1,y)
-	print("1-9 to add/delete E to exit S for settings")
-	_,input = os.pullEvent("char")
-	
-	if (term.isColor()) then
-		term.setBackgroundColor(theme[2])
-	end
-	if input == "e" then
-		break
-	elseif input == "s" then
-		term.clear()
-		term.setCursorPos(1,1)
-		print("[1] Save list")
-		print("[2] Change theme")
-		print("[3] Exit")
-		_,input = os.pullEvent("char")
+end
 
-		if input == "1" then
+--Main function. All running happens here
+function main()
+	drawBG()
+	printex(2, 7, 1, 1, "TODO LIST: ")
+
+	--List the list
+	for i,v in ipairs(todo) do
+		printex(4, 6, 1, 2 + i, v)
+		if 2 + i == ymax then break end
+	end
+
+	printex(3, 6, 1, ymax, "1-9 add/delete | E exit | S settings")
+
+	--Setup actions
+	local menu = false
+	local actions = {
+		["s"] = function()
+			if menu then return end
+			printex(2, 6, 1, 1, "[1] Save List\n[2] Change Theme\n[3] Exit")
+			menu = true
+		end,
+		
+		["1menu"] = function()
 			local file = fs.open("tdl.list", "w")
 			file.write(textutils.serialize(todo))
 			file.close()
-		elseif input == "2" then
+		end,
+		
+		["2menu"] = function()
 			term.clear()
-			term.setCursorPos(1,1)
-			for i,v in pairs(themes) do
-				print("["..i.."]"..v)
+			for i, v in ipairs(themes) do
+				printex(2, 6, 1, i, "["..i.."]"..v)
 			end
 
-			_,input = os.pullEvent("char")
+			local key;
+			repeat key = tonumber(select(2, os.pullEvent("char"))) until key
 
-			if input == "1" then
-				newTheme = themes[1]
-			elseif input == "2" then
-				newTheme = themes[2]
-			elseif input == "3" then
-				newTheme = themes[3]
-			elseif input == "4" then
-				newTheme = themes[4]
-			elseif input == "5" then
-				newTheme = themes[5]
-			elseif input == "6" then
-				newTheme = themes[6]
-			elseif input == "7" then
-				newTheme = themes[7]
-			elseif input == "8" then
-				newTheme = themes[8]
-			elseif input == "9" then
-				newTheme = themes[9]
-			end
-
-			settings = {[1]="",[2]=newTheme}
+			settings = {[1] = "", [2] = themes[key] or "default"}
 
 			local file = fs.open("GS/universal.settings", "w")
-			if settings[2] == nil then
-				settings[2] = "default"
-			end
 			file.write(textutils.serialize(settings))
 			file.close()
+		end,
 
-		elseif input == "3" then
-			--do nothing
-		end
+		["edit"] = function(index)
+			if not todo[index] then
+				term.clear()
+				term.setCursorPos(1,1)
+				print("What do you need to do?")
+				input = read()
+				tostring(input)
+				todo[index] = "["..index.."]" .. input
 
-		--[[
-		local file = fs.open("tdl.list", "w")
-		file.write(textutils.serialize(todo))
-		file.close()
-		]]--
-	elseif input == "1" then
-		if todo[1] == nil then
-			term.clear()
-			term.setCursorPos(1,1)
-			print("What do you need to do?")
-			input = read()
-			tostring(input)
-			todo[1] = "[1]" .. input
-		else
-			todo[1] = nil
+				local file = fs.open("tdl.list", "w")
+				file.write(textutils.serialize(todo))
+				file.close()
+			else todo[index] = nil end
 		end
-	elseif input == "2" then
-		if todo[2] == nil then
-			term.clear()
-			term.setCursorPos(1,1)
-			print("What do you need to do?")
-			input = read()
-			tostring(input)
-			todo[2] = "[2]" .. input
-		else
-			todo[2] = nil
-		end
-	elseif input == "3" then
-		if todo[3] == nil then
-			term.clear()
-			term.setCursorPos(1,1)
-			print("What do you need to do?")
-			input = read()
-			tostring(input)
-			todo[3] = "[3]" .. input
-		else
-			todo[3] = nil
-		end
-	elseif input == "4" then
-		if todo[4] == nil then
-			term.clear()
-			term.setCursorPos(1,1)
-			print("What do you need to do?")
-			input = read()
-			tostring(input)
-			todo[4] = "[4]" .. input
-		else
-			todo[4] = nil
-		end
-	elseif input == "5" then
-		if todo[5] == nil then
-			term.clear()
-			term.setCursorPos(1,1)
-			print("What do you need to do?")
-			input = read()
-			tostring(input)
-			todo[5] = "[5]" .. input
-		else
-			todo[5] = nil
-		end
-	elseif input == "6" then
-		if todo[6] == nil then
-			term.clear()
-			term.setCursorPos(1,1)
-			print("What do you need to do?")
-			input = read()
-			tostring(input)
-			todo[6] = "[6]" .. input
-		else
-			todo[6] = nil
-		end
-	elseif input == "7" then
-		if todo[7] == nil then
-			term.clear()
-			term.setCursorPos(1,1)
-			print("What do you need to do?")
-			input = read()
-			tostring(input)
-			todo[7] = "[7]" .. input
-		else
-			todo[7] = nil
-		end
-	elseif input == "8" then
-		if todo[8] == nil then
-			term.clear()
-			term.setCursorPos(1,1)
-			print("What do you need to do?")
-			input = read()
-			tostring(input)
-			todo[8] = "[8]" .. input
-		else
-			todo[8] = nil
-		end
-	elseif input == "9" then
-		if todo[9] == nil then
-			term.clear()
-			term.setCursorPos(1,1)
-			print("What do you need to do?")
-			input = read()
-			tostring(input)
-			todo[9] = "[9]" .. input
-		else
-			todo[9] = nil
-		end
-	end				
+	}
+
+	--Get input, run according action
+	repeat
+		drawBG()
+		key = select(2, os.pullEvent("char")):lower()
+
+		if menu and actions[key.."menu"] then
+			actions[key]()
+			menu = false
+
+		elseif tonumber(key) and tonumber(key) > 0 then actions["edit"](tonumber(key))
+
+		elseif actions[key] then actions[key]() end
+
+	until (not menu and key == "e") or (menu and key == "3")
 end
+
+--Run the program
+loadLast()
+main()
 
 if (term.isColor()) then
 	term.setBackgroundColor(colors.black)
