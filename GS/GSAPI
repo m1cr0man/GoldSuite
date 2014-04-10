@@ -22,32 +22,46 @@
 --[1]=directory (leave blank if at root)
 --[2]=theme (leave blank if default)
 
-function unserialize( s )
-	if type( s ) ~= "string" then error("String expected, got " .. type( s ), 2 ) end
-	local func, err = loadstring( "return " .. s )
-	if func then
-		setfenv( func, _G )
-		local ok, err = pcall( func )
-		if ok then
-			return err
-		end
+function loadSettings()
+	local settings, index = {}, 1
+	local file = fs.open("GS/universal.conf", "r")
+	for line in file:lines() do
+		if #line < 1 then break end
+		local valName, value = line:match("(%w+) *= *(%w+)")
+		settings[valName] = value
 	end
+	file:close()
+	return settings
 end
 
-function loadTheme()
-	local file = fs.open("GS/universal.settings", "r")
-	local settings = file.readAll()
-	settings = textutils.unserialize(settings)
-	file.close()
-
-	if tostring(settings[2]) == "default" then
-		local default = ""
-		return default
-	else
-		file = fs.open("GS/themes/"..tostring(settings[2]), "r")
-		local theme = file.readAll()
-		theme = unserialize(theme)
-		file.close()
-		return theme
+function saveSettings(settings)
+	local file = fs.open("GS/universal.conf", "w")
+	for i, value in ipairs(settings) do
+		file.write(value.."\n")
 	end
+	file:close()
+end
+
+--[[Theme file layout:
+	<name> = <text>, <header>, <body>, <footer>, <secondary>, <secondary text>
+]]--
+
+function loadTheme()
+	local file = fs.open("GS/themes.conf", "r")
+	local themes = {}
+	for theme in file:lines() do
+		if #theme < 1 then break end
+		local name, text, header, body, footer, secondary, secondtext = theme:match("(%w+) *= *(%w+), *(%w+), *(%w+), *(%w+), *(%w+), *(%w+)")
+		themes[name] = {["text"] = text, ["header"] = tonumber(header), ["body"] = tonumber(body), ["footer"] = tonumber(footer), ["secondary"] = tonumber(secondary), ["secondtext"] = tonumber(secondtext)}
+	end
+	file:close()
+	return themes
+end
+
+function saveThemes(themes)
+	local file = fs.open("GS/themes.conf", "w")
+	for name, data in themes do
+		file.write(name.." = "..table.concat(data, ", "))
+	end
+	file:close()
 end
